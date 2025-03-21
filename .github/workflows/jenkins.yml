@@ -1,3 +1,8 @@
+name: Jenkins to GitHub Actions
+
+on: 
+  push:
+
 jobs:
   install-dependencies-1818055014:
     runs-on: ubuntu-latest
@@ -5,25 +10,18 @@ jobs:
     - name: Checkout Source Code
       uses: actions/checkout@v3
     - name: 'Install Dependencies: Run shell command'
-      run: npm install
+      run: |
+        npm install  # This will install all dependencies, including Vite
 
-  install-vite--1370109218:
+  build-1075488164:
     needs: install-dependencies-1818055014
     runs-on: ubuntu-latest
     steps:
     - name: Checkout Source Code
       uses: actions/checkout@v3
-    - name: 'Install Vite: Run shell command'
-      run: npm install -g vite  # Install Vite globally
-
-  build-1075488164:
-    needs: install-vite--1370109218
-    runs-on: ubuntu-latest
-    steps:
-    - name: Checkout Source Code
-      uses: actions/checkout@v3
     - name: 'Build: Run shell command'
-      run: npm run build  # This should now find vite
+      run: |
+        npm run build  # This should work now as Vite is installed
 
   test--2089507673:
     needs: build-1075488164
