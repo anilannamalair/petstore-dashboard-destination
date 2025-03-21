@@ -1,47 +1,85 @@
 pipeline {
     agent any
+
+    environment {
+        // Define any environment variables here
+        NODE_VERSION = '16.x'
+    }
+
     stages {
-        stage('Checkout') {
+        stage('Setup') {
             steps {
-                // Checkout the code from the repository
-                checkout scm
+                script {
+                    // Install Node.js
+                    sh 'curl -sL https://deb.nodesource.com/setup_$NODE_VERSION | bash -'
+                    sh 'apt-get install -y nodejs'
+
+                    // Verify Node.js and npm installation
+                    sh 'node -v'
+                    sh 'npm -v'
+                }
             }
         }
+        
         stage('Install Dependencies') {
             steps {
-                // Install the dependencies using npm
-                sh 'npm install'
+                script {
+                    sh 'npm install'
+                }
             }
         }
-        stage('Install Vite') {
+
+        stage('Lint') {
             steps {
-                // Install Vite using npm
-                sh 'npm install vite'
+                script {
+                    sh 'npm run lint'
+                }
             }
         }
+
         stage('Build') {
             steps {
-                // Build the project (if there are any build steps)
-                sh 'npm run build'
+                script {
+                    sh 'npm run build'
+                }
             }
         }
+
         stage('Test') {
             steps {
-                // Run the tests
-                sh 'npm test'
+                script {
+                    sh 'npm run test'
+                }
             }
         }
-        stage('Archive') {
+
+        stage('Deploy') {
             steps {
-                // Archive the build artifacts
-                archiveArtifacts artifacts: 'build/**', fingerprint: true
+                script {
+                    echo 'Deploy stage - customize as needed'
+                    // Add your deployment steps here
+                }
             }
         }
     }
+
     post {
         always {
-            // Clean up workspace after build
-            cleanWs()
+            script {
+                echo 'Cleaning up...'
+                // Clean up after the build
+                sh 'rm -rf node_modules'
+            }
+        }
+        success {
+            script {
+                echo 'Build succeeded!'
+            }
+        }
+        failure {
+            script {
+                echo 'Build failed!'
+            }
         }
     }
 }
