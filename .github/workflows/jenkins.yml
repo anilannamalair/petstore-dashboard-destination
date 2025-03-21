@@ -9,9 +9,14 @@ jobs:
     steps:
     - name: Checkout Source Code
       uses: actions/checkout@v3
+    - name: 'Clear npm cache'
+      run: npm cache clean --force  # Clean the npm cache to avoid caching issues
     - name: 'Install Dependencies: Run shell command'
+      run: npm install  # Install all dependencies listed in package.json
+    - name: 'Verify Vite Installation'
       run: |
-        npm install  # This will install all dependencies, including Vite
+        ls -l node_modules/.bin  # List files in node_modules/.bin to verify vite is there
+        npx vite --version  # Print the installed Vite version to check if it's installed
 
   build-1075488164:
     needs: install-dependencies-1818055014
@@ -21,7 +26,7 @@ jobs:
       uses: actions/checkout@v3
     - name: 'Build: Run shell command'
       run: |
-        npm run build  # This should work now as Vite is installed
+        npx vite build  # Use npx to run vite from node_modules/.bin, ensuring it's available
 
   test--2089507673:
     needs: build-1075488164
@@ -30,4 +35,4 @@ jobs:
     - name: Checkout Source Code
       uses: actions/checkout@v3
     - name: 'Test: Run shell command'
-      run: npm test
+      run: npm test  # Run tests after the build is successful
