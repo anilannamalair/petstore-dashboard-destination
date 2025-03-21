@@ -1,85 +1,47 @@
 pipeline {
     agent any
-
-    environment {
-        // Define any environment variables here
-        NODE_VERSION = '16.x'
-    }
-
     stages {
-        stage('Setup') {
+        stage('Checkout') {
             steps {
-                script {
-                    // Install Node.js
-                    sh 'curl -sL https://deb.nodesource.com/setup_$NODE_VERSION | bash -'
-                    sh 'apt-get install -y nodejs'
-
-                    // Verify Node.js and npm installation
-                    sh 'node -v'
-                    sh 'npm -v'
-                }
+                // Checkout the code from the repository
+                checkout scm
             }
         }
-        
         stage('Install Dependencies') {
             steps {
-                script {
-                    sh 'npm install'
-                }
+                // Install the dependencies using npm
+                sh 'npm install'
             }
         }
-
-        stage('Lint') {
+        stage('Install Vite') {
             steps {
-                script {
-                    sh 'npm run lint'
-                }
+                // Install Vite using npm
+                sh 'npm install vite'
             }
         }
-
         stage('Build') {
             steps {
-                script {
-                    sh 'npm run build'
-                }
+                // Build the project (if there are any build steps)
+                sh 'npm run build'
             }
         }
-
         stage('Test') {
             steps {
-                script {
-                    sh 'npm run test'
-                }
+                // Run the tests
+                sh 'npm test'
             }
         }
-
-        stage('Deploy') {
+        stage('Archive') {
             steps {
-                script {
-                    echo 'Deploy stage - customize as needed'
-                    // Add your deployment steps here
-                }
+                // Archive the build artifacts
+                archiveArtifacts artifacts: 'build/**', fingerprint: true
             }
         }
     }
-
     post {
         always {
-            script {
-                echo 'Cleaning up...'
-                // Clean up after the build
-                sh 'rm -rf node_modules'
-            }
-        }
-        success {
-            script {
-                echo 'Build succeeded!'
-            }
-        }
-        failure {
-            script {
-                echo 'Build failed!'
-            }
+            // Clean up workspace after build
+            cleanWs()
         }
     }
 }
