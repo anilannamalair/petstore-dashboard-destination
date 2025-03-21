@@ -1,5 +1,9 @@
 pipeline {
-    agent any
+    agent {
+        node {
+            label 'nodejs'
+        }
+    }
     stages {
         stage('Checkout') {
             steps {
@@ -11,10 +15,6 @@ pipeline {
             steps {
                 // Install the dependencies using npm
                 sh 'npm install'
-            }
-        }
-        stage('Install Vite') {
-            steps {
                 // Install Vite using npm
                 sh 'npm install vite'
             }
